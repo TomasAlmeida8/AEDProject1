@@ -59,26 +59,22 @@
 int solve_iter(int n,integer_t *p,integer_t desired_sum)
 {
  integer_t test_sum;
- for (int comb = 0;comb<(1<<n); comb++)
- {
+ for (int comb = 0;comb<(1<<n); comb++){
+
   test_sum=0;
-  for (int bit = 0;bit< n; bit++)
-  {
-   if (comb & (1<<bit))
-    test_sum += p[bit];   
+
+    for (int bit = 0;bit< n; bit++){
+
+      if (comb & (1<<bit))
+      test_sum += p[bit];   
   }
   
   if (test_sum == desired_sum)
-  {//sucesso
-   //Imprime a combinação descoberta
-   printf("\n A soma %lld é obtida por: ", desired_sum);
-   for (int bit = 0;bit< n; bit++)
   {
-   if (comb & (1<<bit))
-    printf("%lld +",p[bit]);   
-  }
    return 1;
   }
+
+
  }
   
  return 0; //valor desired_sum não encontrado 
@@ -88,28 +84,42 @@ int solve_iter(int n,integer_t *p,integer_t desired_sum)
 // main program
 //
 
-int main(void)
-{
-  fprintf(stderr,"Program configuration:\n");
-  fprintf(stderr,"  min_n ....... %d\n",min_n);
-  fprintf(stderr,"  max_n ....... %d\n",max_n);
-  fprintf(stderr,"  n_sums ...... %d\n",n_sums);
-  fprintf(stderr,"  n_problems .. %d\n",n_problems);
-  fprintf(stderr,"  integer_t ... %d bits\n",8 * (int)sizeof(integer_t));
-  //
-  // solve all the problems
-  
- for (int j = 0; j<30 ; j++){ 
-    int n = all_subset_sum_problems[j].n;
-    integer_t *p = all_subset_sum_problems[j].p;
-    integer_t desired_sum = all_subset_sum_problems[j].sums[j];
-    printf("Quero resolver o problema de ordem %d e encontrar a soma que dá %lld \n", n,desired_sum);
-    if (solve_iter(n, p, desired_sum)==1)
-      printf("Solução Encontrada\n");
-    else
-      printf("Solução Não Encontrada\n");
-  }
+int main(void) {
+    /*
+    fprintf(stderr,"Program configuration:\n");
+    fprintf(stderr,"  min_n ....... %d\n",min_n);
+    fprintf(stderr,"  max_n ....... %d\n",max_n);
+    fprintf(stderr,"  n_sums ...... %d\n",n_sums);
+    fprintf(stderr,"  n_problems .. %d\n",n_problems);
+    fprintf(stderr,"  integer_t ... %d bits\n",8 * (int)sizeof(integer_t));
+     */
+
+    for (int i = 0; i < n_problems; i++) {
+        int n = all_subset_sum_problems[i].n; // The value of n
+
+        if (n > 30)
+            continue; // Skip large values of n
+
+        integer_t *p = all_subset_sum_problems[i].p; // The weights
+        for (int k = 0; k < n_sums; k++)
+        {
+            integer_t desired_sum = all_subset_sum_problems[i].sums[k]; // The desire_sum
+            
+            // Array with the result
+            int result[n];
+            for (int j = 0; j < n; j++)
+                result[j] = 0;
 
 
-  return 0;
+            printf("Para n = %d | Found: %d | ", n, solve_iter(n, p, desired_sum));
+
+             printf("Result: ");
+
+             for (int j = 0; j < n; j++)
+                 printf("%d", result[j]);
+
+             printf("\n");
+        }
+    }
+    return 0;
 }
