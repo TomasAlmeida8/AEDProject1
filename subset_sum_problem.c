@@ -20,12 +20,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../Trabalho1/elapsed_time.h"
-#include "../Trabalho1/000000.h"
+#include "../AEDProject1/elapsed_time.h"
+#include "../AEDProject1/000000.h"
 
 
-//
-//
 //
 // custom data types
 //
@@ -53,16 +51,38 @@
 // place your code here
 //
 // possible function prototype for a recursive brute-force function:
-//int brute_force(int n,integer_t p[n],integer_t desired_sum,int current_index,integer_t partial_sum,int b[n])
-// {
-
-
-
- // }
-// it should return 1 when the solution is found and 0 otherwise
+//   int brute_force(int n,integer_t p[n],integer_t desired_sum,int current_index,integer_t partial_sum,int b[n]);
+// it sould return 1 when the solution is found and 0 otherwise
 // note, however, that you may get a faster function by reducing the number of function arguments (maybe a single pointer to a struct?)
 //
 
+int solve_iter(int n,integer_t *p,integer_t desired_sum)
+{
+ integer_t test_sum;
+ for (int comb = 0;comb<(1<<n); comb++)
+ {
+  test_sum=0;
+  for (int bit = 0;bit< n; bit++)
+  {
+   if (comb & (1<<bit))
+    test_sum += p[bit];   
+  }
+  
+  if (test_sum == desired_sum)
+  {//sucesso
+   //Imprime a combinação descoberta
+   printf("\n A soma %lld é obtida por: ", desired_sum);
+   for (int bit = 0;bit< n; bit++)
+  {
+   if (comb & (1<<bit))
+    printf("%lld +",p[bit]);   
+  }
+   return 1;
+  }
+ }
+  
+ return 0; //valor desired_sum não encontrado 
+}
 
 //
 // main program
@@ -77,40 +97,18 @@ int main(void)
   fprintf(stderr,"  n_problems .. %d\n",n_problems);
   fprintf(stderr,"  integer_t ... %d bits\n",8 * (int)sizeof(integer_t));
   //
-  // for each n
+  // solve the first problem
   //
-  for(int i = 0;i < n_problems;i++)
-  {
-    int n = all_subset_sum_problems[i].n; // the value of n
-    if(n > 20){
-      continue; // skip large values of n
-    }
-    
-    integer_t *ptr_p = all_subset_sum_problems[i].p; // the weights
-    
-    printf("Para todo o problema %d: \n",n);
-    printf("Os valores de p são: ");
-    
-    for (int c = 0; c < n; c++)
-    {
-      printf("%lld ",ptr_p[c]);
-    }
-    
-    //printf("\nAs somas a encontrar são: ", n);
-
-
-    //
-    // for each sum
-    //
-    for(int j = 0;j < n_sums;j++)
-    {
-      integer_t desired_sum = all_subset_sum_problems[i].sums[j]; // the desired sum
-      int b[n]; // array to record the solution
-      //
-      // place your code here
-      //   brute_force(n,p,desired_sum,current_index,partial_sum,b);
-      //
-    }
-  return 0;
+  for (int j = 0; j<30 ; j++){ 
+    int n = all_subset_sum_problems[j].n;
+    integer_t *p = all_subset_sum_problems[j].p;
+    integer_t desired_sum = all_subset_sum_problems[j].sums[j];
+    printf("Quero resolver o problema de ordem %d e encontrar a soma que dá %lld \n", n,desired_sum);
+    if (solve_iter(n, p, desired_sum)==1)
+      printf("Solução Encontrada\n");
+    else
+      printf("Solução Não Encontrada\n");
   }
+
+  return 0;
 }
