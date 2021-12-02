@@ -20,8 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../project1/elapsed_time.h"
-#include "../project1/000000.h"
+#include "../AEDProject1/elapsed_time.h"
+#include "../AEDProject1/000000.h"
 
 
 //
