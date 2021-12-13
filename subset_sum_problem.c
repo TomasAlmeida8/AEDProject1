@@ -20,8 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../AEDProject1/elapsed_time.h"
-#include "../AEDProject1/000000.h"
+#include "./elapsed_time.h"
+#include STUDENT_H_FILE
 
 
 //
@@ -56,59 +56,108 @@
 // note, however, that you may get a faster function by reducing the number of function arguments (maybe a single pointer to a struct?)
 //
 
-int solve_iter(int n,integer_t *p,integer_t desired_sum)
+
+//Brute-force lesma
+char solve_iter(int n,integer_t p[],integer_t desired_sum,int result[])
 {
- integer_t test_sum;
- for (int comb = 0;comb<(1<<n); comb++)
- {
-  test_sum=0;
-  for (int bit = 0;bit< n; bit++)
-  {
-   if (comb & (1<<bit))
-    test_sum += p[bit];   
+ for (int comb = 0;comb<(1<<n); comb++){
+
+    integer_t test_sum=0;
+
+    for (int bit = 0; bit < n; bit++){
+        if (comb & (1<<bit)){
+            test_sum += p[bit];
+            result[bit]=1;
+        }
+
+        else{
+            result[bit]=0;
+        }        
   }
   
-  if (test_sum == desired_sum)
-  {//sucesso
-   //Imprime a combinação descoberta
-   printf("\n A soma %lld é obtida por: ", desired_sum);
-   for (int bit = 0;bit< n; bit++)
-  {
-   if (comb & (1<<bit))
-    printf("%lld +",p[bit]);   
-  }
-   return 1;
-  }
+    if (test_sum == desired_sum)
+        return 1;
+  
+
  }
   
  return 0; //valor desired_sum não encontrado 
+}
+
+//função recursiva lesma
+
+char cleverBruteForce(int n,integer_t *p,integer_t desired_sum,integer_t current_sum,int current_index,int result[])
+{
+    if(current_sum==desired_sum)
+        return 1;
+
+    if(current_sum>desired_sum)
+        return 0;
+    
+    if(current_index==n)
+        return 0;
+
+    
+    for (int index = current_index; index < n; index++){
+        result[index] = 1;
+        if(cleverBruteForce(n, p, desired_sum, current_sum + p[index], ++current_index,result))
+            return 1;
+        result[index]= 0;
+    }
+
+    return 0;
 }
 
 //
 // main program
 //
 
-int main(void)
-{
-  fprintf(stderr,"Program configuration:\n");
-  fprintf(stderr,"  min_n ....... %d\n",min_n);
-  fprintf(stderr,"  max_n ....... %d\n",max_n);
-  fprintf(stderr,"  n_sums ...... %d\n",n_sums);
-  fprintf(stderr,"  n_problems .. %d\n",n_problems);
-  fprintf(stderr,"  integer_t ... %d bits\n",8 * (int)sizeof(integer_t));
-  //
-  // solve the first problem
-  //
-  for (int j = 0; j<30 ; j++){ 
-    int n = all_subset_sum_problems[j].n;
-    integer_t *p = all_subset_sum_problems[j].p;
-    integer_t desired_sum = all_subset_sum_problems[j].sums[j];
-    printf("Quero resolver o problema de ordem %d e encontrar a soma que dá %lld \n", n,desired_sum);
-    if (solve_iter(n, p, desired_sum)==1)
-      printf("Solução Encontrada\n");
-    else
-      printf("Solução Não Encontrada\n");
-  }
+int main(void) {
+    /*
+    fprintf(stderr,"Program configuration:\n");
+    fprintf(stderr,"  min_n ....... %d\n",min_n);
+    fprintf(stderr,"  max_n ....... %d\n",max_n);
+    fprintf(stderr,"  n_sums ...... %d\n",n_sums);
+    fprintf(stderr,"  n_problems .. %d\n",n_problems);
+    fprintf(stderr,"  integer_t ... %d bits\n",8 * (int)sizeof(integer_t));
+     */
 
-  return 0;
+    for (int i = 0; i < n_problems; i++) {
+        int n = all_subset_sum_problems[i].n; // The value of n
+
+        if (n > 30)
+            continue; // Skip large values of n
+
+        integer_t *p = all_subset_sum_problems[i].p; // The weights
+        for (int k = 0; k < n_sums; k++)
+        {
+            integer_t desired_sum = all_subset_sum_problems[i].sums[k]; // The desire_sum
+            
+            // Array with the result
+            int result[n];
+            for (int j = 0; j < n; j++)
+                result[j] = 0;
+
+            int found = 0;
+            double t1 = cpu_time();
+            found = solve_iter(n, p, desired_sum, result);
+            //found = cleverBruteForce(n, p, desired_sum, 0, 0, result);
+            double t2 = cpu_time();
+            
+            printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, t2 - t1);
+            
+            
+
+             printf("Result: ");
+
+             for (int j = 0; j < n; j++)
+                 printf("%d", result[j]);
+
+             printf("\n");
+
+            break;
+            
+        }
+    }
+    return 0;
 }
