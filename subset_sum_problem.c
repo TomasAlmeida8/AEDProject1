@@ -20,7 +20,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "./elapsed_time.h"
+#include <math.h>
+#include "elapsed_time.h"
+#include <string.h>
 #include STUDENT_H_FILE
 
 
@@ -108,6 +110,87 @@ char cleverBruteForce(int n,integer_t *p,integer_t desired_sum,integer_t current
     return 0;
 }
 
+
+//-------------------------------------------------------------3ª Função--------------------------------------
+
+//Criar array x1 e x2 que é o array p dividido em 2
+char algoritmo(int n,integer_t p[],integer_t desired_sum){
+    int *firstHalf = malloc ((floor(n/2) * sizeof(int)));
+
+    int *secondHalf = malloc ((ceil(n/2) * sizeof(int)))
+
+
+    memcpy(firstHalf, p, floor(n/2) * sizeof(int));
+    memcpy(secondHalf, p + ceil(n/2), ceil(n/2) * sizeof(int));
+
+
+
+
+    //print array for debug
+    int firstHalf[];
+    int i;
+​
+for (i = 0; i < n/2; i++) {
+printf("%d ", firstHalf[i]);
+}
+}
+
+
+
+
+
+char sums(int n,integer_t p[]){
+
+
+for (int comb = 0;comb<(1<<n); comb++){
+
+    integer_t test_sum=0;
+
+    for (int bit = 0; bit < n; bit++){
+        if (comb & (1<<bit)){
+            test_sum += p[bit]; 
+                }
+        }
+    }
+}
+
+
+
+
+
+//quickSort
+
+/* low  --> Starting index,  high  --> Ending index */
+// quickSort(integer_t p[], low, high)
+// {
+    
+//     if (low < high)
+//     {
+//         /* pi is partitioning index, arr[pi] is now
+//            at right place */
+//         pi = partition(arr, low, high);
+
+//         quickSort(arr, low, pi - 1);  // Before pi
+//         quickSort(arr, pi + 1, high); // After pi
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //
 // main program
 //
@@ -139,24 +222,24 @@ int main(void) {
                 result[j] = 0;
 
             int found = 0;
-            double t1 = cpu_time();
-            found = solve_iter(n, p, desired_sum, result);
+            //double t1 = cpu_time();
+            //found = solve_iter(n, p, desired_sum, result);
             //found = cleverBruteForce(n, p, desired_sum, 0, 0, result);
-            double t2 = cpu_time();
+            //double t2 = cpu_time();
             
-            printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, t2 - t1);
+            //printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, t2 - t1);
             
             
 
-             printf("Result: ");
+            // printf("Result: ");
 
-             for (int j = 0; j < n; j++)
-                 printf("%d", result[j]);
+            //  for (int j = 0; j < n; j++)
+            //      printf("%d", result[j]);
 
-             printf("\n");
+            //  printf("\n");
 
-            break;
-            
+            // break;
+            x=algoritmo(n, p, desired_sum);
         }
     }
     return 0;
