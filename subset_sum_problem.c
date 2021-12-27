@@ -111,48 +111,67 @@ char cleverBruteForce(int n,integer_t *p,integer_t desired_sum,integer_t current
 }
 
 
-//-------------------------------------------------------------3ª Função--------------------------------------
+//--------------------------------------------------------------------3ª Função-----------------------------------------------------------------------------------
 
-//Criar array x1 e x2 que é o array p dividido em 2
+//Função final
 char algoritmo(int n,integer_t p[],integer_t desired_sum){
-    int *firstHalf = malloc ((floor(n/2) * sizeof(int)));
 
-    int *secondHalf = malloc ((ceil(n/2) * sizeof(int)))
-
-
-    memcpy(firstHalf, p, floor(n/2) * sizeof(int));
-    memcpy(secondHalf, p + ceil(n/2), ceil(n/2) * sizeof(int));
-
-
-
-
-    //print array for debug
-    int firstHalf[];
-    int i;
-​
-for (i = 0; i < n/2; i++) {
-printf("%d ", firstHalf[i]);
-}
 }
 
 
 
+//-------------------------------Dividir o array n em dois arrays com o mesmo tamanho-------------------
+int divideArrays (integer_t p[], int n){
 
+    int x1 = n/2; //tamanho do primeiro array
+    int x2 = n/2 + n%2; //tamanho do segundo array
+    int x3 = 0 ; //counter para adicionar ao segundo array
 
-char sums(int n,integer_t p[]){
+    integer_t firstHalf[x1]; //criaçao primeiro array
+    integer_t secondHalf[x2]; //criaçao segundo array
 
-
-for (int comb = 0;comb<(1<<n); comb++){
-
-    integer_t test_sum=0;
-
-    for (int bit = 0; bit < n; bit++){
-        if (comb & (1<<bit)){
-            test_sum += p[bit]; 
-                }
+    for (int i=0; i < n; i++){
+        if (i < n/2){
+            firstHalf[i]=p[i]; //adicionar ao primeiro array
+        } else {
+            secondHalf[x3]=p[i]; //adicionar ao segundo array
+            x3++;
         }
     }
+    
+
+
+    //TESTES
+
+    //printf("%lld    ",firstHalf[15]);
+    //printf("%lld    ",secondHalf[5]);
+
+    return 0;
 }
+
+
+//------------------------------------------------------- SOMAS DOS ARRAYS CRIADOS firstHalf e secondHalf -------------------------
+int somaArrays(integer_t halfArray[], int n){ //POR FAZER
+
+
+    for (int comb = 0;comb<(1<<n); comb++){
+
+        integer_t test_sum=0;
+
+        for (int bit = 0; bit < n; bit++){
+            if (comb & (1<<bit)){
+                test_sum += halfArray[bit];
+            }
+    }
+
+  return 0;
+ }
+
+
+
+
+
+
 
 
 
@@ -226,6 +245,7 @@ int main(void) {
             //found = solve_iter(n, p, desired_sum, result);
             //found = cleverBruteForce(n, p, desired_sum, 0, 0, result);
             //double t2 = cpu_time();
+            divideArrays (p, n);
             
             //printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, t2 - t1);
             
@@ -239,7 +259,6 @@ int main(void) {
             //  printf("\n");
 
             // break;
-            x=algoritmo(n, p, desired_sum);
         }
     }
     return 0;
