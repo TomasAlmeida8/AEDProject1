@@ -112,102 +112,137 @@ char cleverBruteForce(int n,integer_t *p,integer_t desired_sum,integer_t current
 
 
 //--------------------------------------------------------------------3ª Função-----------------------------------------------------------------------------------
-
-//Função final
-char algoritmo(int n,integer_t p[],integer_t desired_sum){
-
+void swap(integer_t *a, integer_t *b)
+{
+    integer_t t = *a;
+    *a = *b;
+    *b = t;
 }
 
 
 
-//-------------------------------Dividir o array n em dois arrays com o mesmo tamanho-------------------
-int divideArrays (integer_t p[], int n){
+/* This function takes last element as pivot, places
+   the pivot element at its correct position in sorted
+    array, and places all smaller (smaller than pivot)
+   to left of pivot and all greater elements to right
+   of pivot */
+integer_t partition (integer_t array[], integer_t low, integer_t high)
+{
+    // pivot (Element to be placed at right position)
+    integer_t pivot = array[high];  
+ 
+    integer_t i = (low - 1);  // Index of smaller element and indicates the 
+                   // right position of pivot found so far
 
-    int x1 = n/2; //tamanho do primeiro array
-    int x2 = n/2 + n%2; //tamanho do segundo array
+    for (integer_t j = low; j <= high- 1; j++)
+    {
+        // If current element is smaller than the pivot
+        if (array[j] < pivot)
+        {
+            i++;    // increment index of smaller element
+            swap(&array[i], &array[j]);
+        }
+    }
+    swap(&array[i + 1], &array[high]);
+    return (i + 1);
+}
+
+
+
+/* low  --> Starting index,  high  --> Ending index */
+void quickSort(integer_t array[], integer_t low, integer_t high){
+    
+    if (low < high)
+    {
+        /* pi is partitioning index, arr[pi] is now
+           at right place */
+        integer_t pi = partition(array, low, high);
+
+        quickSort(array, low, pi - 1);  // Before pi
+        quickSort(array, pi + 1, high); // After pi
+    }
+}
+
+
+
+//Função final
+char algoritmo(int n,integer_t p[],integer_t desired_sum){
+
+    int x1 = n/2 + n%2; //tamanho array 1
+    int x2 = n/2; //tamanho array 2
     int x3 = 0 ; //counter para adicionar ao segundo array
+
+    integer_t s1 = 1<<x1; //tamanho array soma 1
+    integer_t s2 = 1<<x2; //tamanho array soma 2
+
 
     integer_t firstHalf[x1]; //criaçao primeiro array
     integer_t secondHalf[x2]; //criaçao segundo array
+    integer_t *sum1; //criaçao array soma 1
+    integer_t *sum2; //criaçao array soma 2
 
-    for (int i=0; i < n; i++){
-        if (i < n/2){
+    sum1 = (integer_t *)malloc(s1 * sizeof(integer_t));
+    sum2 = (integer_t *)malloc(s2 * sizeof(integer_t));
+
+    //Adicionar os numeros aos arrays 1 e 2
+    for (integer_t i=0; i < n; i++){
+        if (i < n/2+n%2){
             firstHalf[i]=p[i]; //adicionar ao primeiro array
         } else {
             secondHalf[x3]=p[i]; //adicionar ao segundo array
             x3++;
         }
     }
-    
 
 
-    //TESTES
+    //Fazer soma array 1 e adicionar ao array sum1
+    for (integer_t i = 0;i < s1; i++){
 
-    //printf("%lld    ",firstHalf[15]);
-    //printf("%lld    ",secondHalf[5]);
+        integer_t soma1=0;
 
-    return 0;
-}
-
-
-//------------------------------------------------------- SOMAS DOS ARRAYS CRIADOS firstHalf e secondHalf -------------------------
-int somaArrays(integer_t halfArray[], int n){ //POR FAZER
-
-
-    for (int comb = 0;comb<(1<<n); comb++){
-
-        integer_t test_sum=0;
-
-        for (int bit = 0; bit < n; bit++){
-            if (comb & (1<<bit)){
-                test_sum += halfArray[bit];
+        for (integer_t j = 0; j < s1; j++){
+            if (i & (1ull<<j)){
+                soma1 += firstHalf[j];
             }
+        sum1[i] = soma1;
+        }
     }
 
-  return 0;
- }
+    //Fazer soma array 2 e adicionar ao array sum2
+    for (integer_t i = 0; i < s2; i++){
 
+        integer_t soma2=0;
 
+        for (integer_t j = 0; j < s2; j++){
+            if (i & (1ull<<j)){
+                soma2 += secondHalf[j];
+            }
+        sum2[i] = soma2;
+        }
+    }
 
+    quickSort(sum1, 0, s1-1);
+    quickSort(sum2,0,s2-1);
 
+    integer_t k1 = 0;
+    integer_t k2 = s2-1;
 
+    while (k1 < s1 && k2 >= 0){
+        if (sum1[k1] + sum2[k2] == desired_sum){
+            return 1;
 
+        } else if (sum1[k1] + sum2[k2] > desired_sum){
+            k2--;
+        } else if (sum1[k1] + sum2[k2] < desired_sum){
+            k1++;
+        } 
+    }
 
-
-
-
-
-//quickSort
-
-/* low  --> Starting index,  high  --> Ending index */
-// quickSort(integer_t p[], low, high)
-// {
+    free(sum1);
+    free(sum2);
     
-//     if (low < high)
-//     {
-//         /* pi is partitioning index, arr[pi] is now
-//            at right place */
-//         pi = partition(arr, low, high);
-
-//         quickSort(arr, low, pi - 1);  // Before pi
-//         quickSort(arr, pi + 1, high); // After pi
-//     }
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return 0;
+}
 
 
 //
@@ -227,7 +262,7 @@ int main(void) {
     for (int i = 0; i < n_problems; i++) {
         int n = all_subset_sum_problems[i].n; // The value of n
 
-        if (n > 30)
+        if (n > 50)
             continue; // Skip large values of n
 
         integer_t *p = all_subset_sum_problems[i].p; // The weights
@@ -241,25 +276,27 @@ int main(void) {
                 result[j] = 0;
 
             int found = 0;
-            //double t1 = cpu_time();
+            double t1 = cpu_time();
             //found = solve_iter(n, p, desired_sum, result);
-            //found = cleverBruteForce(n, p, desired_sum, 0, 0, result);
-            //double t2 = cpu_time();
-            divideArrays (p, n);
-            
-            //printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, t2 - t1);
+            found = cleverBruteForce(n, p, desired_sum, 0, 0, result);
+            //found = algoritmo(n,p,desired_sum);
+            double t2 = cpu_time();
             
             
+            printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, t2 - t1);
+            
+            
 
-            // printf("Result: ");
+            printf("Result: ");
 
-            //  for (int j = 0; j < n; j++)
-            //      printf("%d", result[j]);
+             for (int j = 0; j < n; j++)
+                 printf("%d", result[j]);
 
-            //  printf("\n");
+             printf("\n");
 
-            // break;
+            //break; //1 n ou varios n's.
         }
     }
+
     return 0;
 }
