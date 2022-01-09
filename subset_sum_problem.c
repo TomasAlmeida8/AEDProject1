@@ -59,8 +59,10 @@
 //
 
 
-//Brute-force lesma
-char solve_iter(int n,integer_t p[],integer_t desired_sum,int result[])
+
+
+//Função Brute-force 
+char bruteForce(int n,integer_t p[],integer_t desired_sum,int result[])
 {
  for (int comb = 0;comb<(1<<n); comb++){
 
@@ -86,9 +88,9 @@ char solve_iter(int n,integer_t p[],integer_t desired_sum,int result[])
  return 0; //valor desired_sum não encontrado 
 }
 
-//função recursiva lesma
+//Função Branch and Bound
 
-char cleverBruteForce(int n,integer_t *p,integer_t desired_sum,integer_t current_sum,int current_index,int result[])
+char branchAndBound(int n,integer_t *p,integer_t desired_sum,integer_t current_sum,int current_index,int result[])
 {
     if(current_sum==desired_sum)
         return 1;
@@ -102,7 +104,7 @@ char cleverBruteForce(int n,integer_t *p,integer_t desired_sum,integer_t current
     
     for (int index = current_index; index < n; index++){
         result[index] = 1;
-        if(cleverBruteForce(n, p, desired_sum, current_sum + p[index], ++current_index,result))
+        if(branchAndBound(n, p, desired_sum, current_sum + p[index], ++current_index,result))
             return 1;
         result[index]= 0;
     }
@@ -164,71 +166,43 @@ void quickSort(integer_t array[], integer_t low, integer_t high){
 }
 
 
+int decimalToBinary(integer_t n, integer_t c, int index, int result[]){
+
+
+  for (integer_t i = index; i < (c+index); i++)
+  {
+    integer_t k = (n>>(i-index));
+
+    if (k & 1)
+      result[i]=1;
+    else
+      result[i]=0;
+  }
+
+  return 0;
+}
 
 //Função final
-char algoritmo(int n,integer_t p[],integer_t desired_sum){
+char meetInMiddle(integer_t sum1[], integer_t sum2[], integer_t s1, integer_t s2, integer_t desired_sum,int result[], integer_t sum11[], integer_t sum22[], int x1, int x2){
 
-    int x1 = n/2 + n%2; //tamanho array 1
-    int x2 = n/2; //tamanho array 2
-    int x3 = 0 ; //counter para adicionar ao segundo array
-
-    integer_t s1 = 1<<x1; //tamanho array soma 1
-    integer_t s2 = 1<<x2; //tamanho array soma 2
-
-
-    integer_t firstHalf[x1]; //criaçao primeiro array
-    integer_t secondHalf[x2]; //criaçao segundo array
-    integer_t *sum1; //criaçao array soma 1
-    integer_t *sum2; //criaçao array soma 2
-
-    sum1 = (integer_t *)malloc(s1 * sizeof(integer_t));
-    sum2 = (integer_t *)malloc(s2 * sizeof(integer_t));
-
-    //Adicionar os numeros aos arrays 1 e 2
-    for (integer_t i=0; i < n; i++){
-        if (i < n/2+n%2){
-            firstHalf[i]=p[i]; //adicionar ao primeiro array
-        } else {
-            secondHalf[x3]=p[i]; //adicionar ao segundo array
-            x3++;
-        }
-    }
-
-
-    //Fazer soma array 1 e adicionar ao array sum1
-    for (integer_t i = 0;i < s1; i++){
-
-        integer_t soma1=0;
-
-        for (integer_t j = 0; j < s1; j++){
-            if (i & (1ull<<j)){
-                soma1 += firstHalf[j];
-            }
-        sum1[i] = soma1;
-        }
-    }
-
-    //Fazer soma array 2 e adicionar ao array sum2
-    for (integer_t i = 0; i < s2; i++){
-
-        integer_t soma2=0;
-
-        for (integer_t j = 0; j < s2; j++){
-            if (i & (1ull<<j)){
-                soma2 += secondHalf[j];
-            }
-        sum2[i] = soma2;
-        }
-    }
-
-    quickSort(sum1, 0, s1-1);
-    quickSort(sum2,0,s2-1);
-
+    
     integer_t k1 = 0;
     integer_t k2 = s2-1;
 
     while (k1 < s1 && k2 >= 0){
         if (sum1[k1] + sum2[k2] == desired_sum){
+            for(integer_t count1 = 0; count1 < s1; count1++){
+                if(sum11[count1] == sum1[k1]){
+                    decimalToBinary(count1, x1, 0, result);
+                    break;
+                }
+            }
+            for(integer_t count2 = 0; count2 < s2; count2++){
+                if(sum22[count2] == sum2[k2]){
+                    decimalToBinary(count2, x2, x1, result);
+                    break;
+                }
+            }
             return 1;
 
         } else if (sum1[k1] + sum2[k2] > desired_sum){
@@ -237,10 +211,6 @@ char algoritmo(int n,integer_t p[],integer_t desired_sum){
             k1++;
         } 
     }
-
-    free(sum1);
-    free(sum2);
-    
     return 0;
 }
 
@@ -260,12 +230,90 @@ int main(void) {
      */
 
     for (int i = 0; i < n_problems; i++) {
+        integer_t *p = all_subset_sum_problems[i].p; // The weights
         int n = all_subset_sum_problems[i].n; // The value of n
+            
 
-        if (n > 50)
+            //Tirar proxima linha de comentário se pretende executar o Meet in the Middle bem como a linha 343
+
+             double tempoSums1 = cpu_time();
+            int x1 = n/2 + n%2; //tamanho array 1
+            int x2 = n/2; //tamanho array 2
+            int x3 = 0 ; //counter para adicionar ao segundo array
+
+            integer_t s1 = 1<<x1; //tamanho array soma 1
+            integer_t s2 = 1<<x2; //tamanho array soma 2
+
+
+            integer_t firstHalf[x1]; //criaçao primeiro array
+            integer_t secondHalf[x2]; //criaçao segundo array
+            integer_t *sum1; //criaçao array soma 1
+            integer_t *sum2; //criaçao array soma 2
+            integer_t *sum11; //criaçao outro array sum1 usado para o res em binario
+            integer_t *sum22; //criaçao outro array sum2 usado para o res em binario
+
+            sum1 = (integer_t *)malloc(s1 * sizeof(integer_t));
+            sum2 = (integer_t *)malloc(s2 * sizeof(integer_t));
+            sum11 = (integer_t *)malloc(s2 * sizeof(integer_t));
+            sum22 = (integer_t *)malloc(s2 * sizeof(integer_t));
+
+
+            //Adicionar os numeros aos arrays 1 e 2
+            for (int i = 0; i < n; i++){
+                if (i < (n/2+n%2)){
+                    firstHalf[i]=p[i]; //adicionar ao primeiro array
+                } else {
+                    secondHalf[x3]=p[i]; //adicionar ao segundo array
+                    x3++;
+                }
+            }
+
+            //Fazer soma array 1 e adicionar ao array sum1
+            for (integer_t i = 0;i < s1; i++){
+
+               integer_t soma1=0;
+
+                for (int j = 0; j < n; j++){
+                    if (i & (1ull<<j)){
+                        soma1 += firstHalf[j];
+                    }
+                }
+                sum1[i] = soma1;
+                sum11[i] = soma1;
+            }
+
+            //Fazer soma array 2 e adicionar ao array sum2
+            for (integer_t i = 0; i < s2; i++){
+
+                integer_t soma2=0;
+
+                for (int j = 0; j < n; j++){
+                    if (i & (1ull<<j)){
+                        soma2 += secondHalf[j];
+                    }
+                }
+                sum2[i] = soma2;
+                sum22[i] = soma2;
+            }
+
+            // for (int counter = 0; counter < s1; counter++){
+            //     printf("%lld  ",sum1[counter]);
+            // }
+
+            quickSort(sum1, 0, s1-1);
+            quickSort(sum2,0,s2-1);
+
+           double tempoSums2 = cpu_time();
+
+           double tempoSums = (tempoSums2 - tempoSums1) / (double)20;
+
+
+            
+
+        if (n > 60)
             continue; // Skip large values of n
 
-        integer_t *p = all_subset_sum_problems[i].p; // The weights
+        
         for (int k = 0; k < n_sums; k++)
         {
             integer_t desired_sum = all_subset_sum_problems[i].sums[k]; // The desire_sum
@@ -275,27 +323,48 @@ int main(void) {
             for (int j = 0; j < n; j++)
                 result[j] = 0;
 
-            int found = 0;
+            char found;
             double t1 = cpu_time();
-            //found = solve_iter(n, p, desired_sum, result);
-            found = cleverBruteForce(n, p, desired_sum, 0, 0, result);
-            //found = algoritmo(n,p,desired_sum);
+
+            //Tirar proxima linha de comentário se pretende executar o Brute-Force
+
+            //found = bruteForce(n, p, desired_sum, result);
+
+
+
+            //Tirar proxima linha de comentário se pretende executar o Recursiva
+
+            //found = branchAndBound(n, p, desired_sum, 0, 0, result);
+
+
+
+            //Tirar proxima linha de comentário se pretende executar o Meet in the Middle bem como as linhas 240-305
+
+            found = meetInMiddle(sum1, sum2, s1, s2, desired_sum, result, sum11, sum22, x1, x2);
+
+
+
+
             double t2 = cpu_time();
             
             
-            printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, t2 - t1);
+            // printf("Para n = %d | Found: %d | Time: %.6f seconds ", n, found, (t2 - t1)+tempoSums);
             
-            
 
-            printf("Result: ");
+            // printf("Result: ");
 
-             for (int j = 0; j < n; j++)
-                 printf("%d", result[j]);
+            //  for (int j = 0; j < n; j++)
+            //      printf("%d", result[j]);
 
-             printf("\n");
+            //  printf("\n");
 
             //break; //1 n ou varios n's.
+            
+            printf("%d %d %d %d %f\n", 2, n, k, found, (t2 - t1)+tempoSums);
+            
         }
+
+ 
     }
 
     return 0;
